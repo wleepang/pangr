@@ -9,7 +9,7 @@
 #' @details
 #' Uses the color's underlying RGB space to generate the hex code.
 #' 
-#' @section DEPRECATED
+#' @section DEPRECATED:
 #' Use \link[grDevices]{adjustcolor} instead.
 #' 
 #' @return
