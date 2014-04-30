@@ -83,10 +83,14 @@ re.capture = function(pattern, string, ...) {
 #' 
 #' @param pattern Regex pattern with named capturing groups
 #' @param x Character vector where \code{pattern} is searched for in each element
+#' @param ... Additional arguments passed to \link[base]{gregexpr}.
 #' 
 #' @return
 #' A list the same length as \code{x} where each element has named elements
 #' corresponding to the named groups in \code{pattern}.
+#' 
+#' @seealso
+#' \link[base]{gregexpr}
 #' 
 #' @export
 gregexcap = function(pattern, x, ...) {
