@@ -147,7 +147,7 @@ uniquify = function(SET, target.col=1, uniquifier.col=2) {
   return(keys)
 }
 
-#' Check if a value is within and interval
+#' Check if a value is within an interval
 #' 
 #' @param x A numeric vector of values to test
 #' @param interval A numeric vector with at least 2 unique values that defines
