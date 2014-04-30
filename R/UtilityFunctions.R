@@ -146,3 +146,83 @@ uniquify = function(SET, target.col=1, uniquifier.col=2) {
   keys = apply(SET, 1, function(r) {ifelse(r[target.col] %in% not.unq, paste(r[c(target.col,uniquifier.col)], collapse='.'), r[1])})
   return(keys)
 }
+
+#' Check if a value is within and interval
+#' 
+#' @param x A numeric vector of values to test
+#' @param interval A numeric vector with at least 2 unique values that defines
+#'   the interval over which the value of \code{x} must reside
+#' @param endpts A character value that determines how endpoints are treated to
+#'   determine "between-ness":
+#'   \describe{
+#'    \item{both}{(Default) \code{TRUE} if min(interval) <= x <= max(interval)}
+#'    \item{lb}{\code{TRUE} if min(interval) <= x < max(interval)}
+#'    \item{ub}{\code{TRUE} if min(interval) < x <= max(interval)}
+#'    \item{none}{\code{TRUE} if min(interval) < x < max(interval)}
+#'   }
+#' 
+#' @return
+#' A logical vector the same size as \code{x} that is \code{TRUE} for elements
+#' of \code{x} that satisfy the conditions defined by \code{interval} and \code{endpts},
+#' and \code{FALSE} otherwise.
+#' 
+#' @export
+is.between = function(x, interval, na.rm=T, endpts=c('both', 'lb', 'ub', 'none')) {
+  lb = min(interval, na.rm=na.rm)
+  ub = max(interval, na.rm=na.rm)
+  TF = switch(match.arg(include), 
+              lb = {
+                x < ub & x >= lb
+              }, ub = {
+                x <= ub & x > lb
+              }, none = {
+                x < ub & x > lb
+              }, {
+                # both, is default case
+                x <= ub & x >= lb
+              })
+  
+  return(TF)
+}
+
+MultiSetFun = function(fun, x) {
+  # performs a set function (e.g. intersect, setdiff) on x
+  # where x is a list of vectors of the same type but not necessarily the same length
+  
+  fun = tolower(fun)
+  
+  this.intersect = function(M, v) {
+    return(names(which(rowSums(M) == sum(v))))
+  }
+  
+  this.setdiff = function(M, v) {
+    D = lapply(v, function(i){
+      names(which(rowSums(M) == i))
+    })
+    names(D) = colnames(M)
+    return(D)
+  }
+  
+  this.union = function(M, v) {
+    return(rownames(M))
+  }
+  
+  # concatenate all unique elements in x - this is effectively a union
+  U = sort(unique(do.call('c', unname(x))))
+  
+  # set truth map, (i,j) is true if element i is in set j
+  M = as.matrix(as.data.frame(lapply(x, function(l){U %in% l})))
+  rownames(M) = U
+  
+  # apply column values
+  v = 2^seq(0, ncol(M)-1)
+  M = t(t(M) * v)
+  
+  return(
+    switch(fun, 
+           intersect = this.intersect(M,v),
+           setdiff   = this.setdiff(M,v),
+           union     = this.union(M,v),
+           NULL) )
+  
+}
