@@ -85,12 +85,33 @@ re.capture = function(pattern, string, ...) {
 #' @param x Character vector where \code{pattern} is searched for in each element
 #' @param ... Additional arguments passed to \link[base]{gregexpr}.
 #' 
+#' @details
+#' A wrapper for \link[base]{gregexpr} that facilitates retrieval of named
+#' capture groups
+#' 
 #' @return
 #' A list the same length as \code{x} where each element has named elements
 #' corresponding to the named groups in \code{pattern}.
 #' 
 #' @seealso
 #' \link[base]{gregexpr}
+#' 
+#' @examples
+#' > x = '`a` + `[b]` + `[1c]` + `[d] e`'
+#' > z = '`f` + `[g]` + `[1h]` + `[i] j`'
+#' > gregexcap('`(?<tok>.*?)`', x)
+#' [[1]]
+#' [[1]]$tok
+#' [1] "a"     "[b]"   "[1c]"  "[d] e"
+#' 
+#' > gregexcap('`(?<tok>.*?)`', c(x,z))
+#' [[1]]
+#' [[1]]$tok
+#' [1] "a"     "[b]"   "[1c]"  "[d] e"
+#'  
+#' [[2]]
+#' [[2]]$tok
+#' [1] "f"      "[g]"    "[1h]"  "[i] j"
 #' 
 #' @export
 gregexcap = function(pattern, x, ...) {
