@@ -15,6 +15,8 @@
 #' @return
 #' A list the same length as \code{s} whose elements are lists whose names are 
 #' extracted keys and elements are extracted values.
+#' 
+#' @export
 kvp = function(s, pair.split=';', kv.split=':') {
   # splits a string of delimited key-value pairs into a heirarchical named list
   # with names as keys
@@ -51,6 +53,8 @@ kvp = function(s, pair.split=';', kv.split=':') {
 #' @return
 #' A vector the same length as \code{s} of values defined by \code{key} and
 #' and transformed by \code{val.fun}
+#' 
+#' @export
 getKeyValue = function(s, key, val.fun=identity, ...) {
   # extracts a key associated value from a string of delimited key-value pairs
   # converts the output according to val.fun(x, ...)
