@@ -1,7 +1,7 @@
 Package: pangr
 Type: Package
 Title: W. Lee Pang's useful utility functions for R
-Version: 0.0.1
+Version: 0.0.2
 Date: 2014-04-30
 Author: W. Lee Pang
 Maintainer: W. Lee Pang <wleepang@gmail.com>
