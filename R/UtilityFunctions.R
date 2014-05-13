@@ -170,7 +170,7 @@ uniquify = function(SET, target.col=1, uniquifier.col=2) {
 is.between = function(x, interval, na.rm=T, endpts=c('both', 'lb', 'ub', 'none')) {
   lb = min(interval, na.rm=na.rm)
   ub = max(interval, na.rm=na.rm)
-  TF = switch(match.arg(include), 
+  TF = switch(match.arg(endpts), 
               lb = {
                 x < ub & x >= lb
               }, ub = {
