@@ -2,7 +2,7 @@ Package: pangr
 Type: Package
 Title: W. Lee Pang's useful utility functions for R
 Version: 0.0.3
-Date: 2014-04-30
+Date: 2014-05-19
 Author: W. Lee Pang
 Maintainer: W. Lee Pang <wleepang@gmail.com>
 Description: A library of utility or wrapper functions to make working in R
