@@ -226,3 +226,80 @@ MultiSetFun = function(fun, x) {
            NULL) )
   
 }
+
+#' Determine local extrema
+#' 
+#' Determines the coordinates of local extrema in a series and identifies them as
+#' either maxima or minima.
+#' 
+#' @param x Either an \link{xy.coords} object or an atomic numeric vector of x-coordinates
+#' @param y Required if \code{x} is atomic, an atomic numeric vector of y-coordinates
+#'   the same length as \code{x}.
+#' @param ztol Tolerance for "zero" values. Default: 1e-5.
+#' @param fx Multiplicative factor by which the number of points in the data is
+#'   expanded (via \link{splinefun}) to refine extrema location detection. Default: 1000.
+#'
+#' @details
+#' The data series is first smoothed using adaptive loess and then spline interpolated
+#' between points.  Zero-crossings of the first derivative of spline interpolated data 
+#' are extracted as local extrema.  The nearest 10 points (5-pre, 5-post) surrounding
+#' the extrema are used to determine if the extrema is a local minimum or local maximum.
+#' 
+#' @return
+#' An \link{xy.coords} compatible list with the following elements:
+#' \describe{
+#'  \item{x}{x-coordinates of local extrema}
+#'  \item{y}{y-coordinates of local extrema}
+#'  \item{indices}{indices of local extrema in the original data}
+#'  \item{is.maxima}{logical vector the same length as indices where \code{TRUE} indicates a local maximum}
+#' }
+#' 
+#' @seealso
+#' \link{xy.coords}, \link{smooth.adaptive.loess}, \link{splinefun}
+#' 
+#' @export
+extrema = function(x, y=NULL, ztol=1e-5, fx=1000) {
+  # locates local extrema
+  
+  # x can be either an atomic vector or an xy.coords list
+  if (is.atomic(x)) {
+    if(is.null(y)) {
+      xy = list(x=seq_along(x), y=x)  
+    } else {
+      if (length(x) != length(y)) {
+        stop('x and y not of same length')
+      }
+      xy = list(x=x, y=y)  
+    }
+    
+  } else if (is.recursive(x)) {
+    if (is.null(x$x) || is.null(x$y)) {
+      stop('x not an xy.coords object')
+    }
+    xy = x
+  }
+  
+  # smooth xy using adaptive loess
+  xys = smooth.adaptive.loess(xy)
+  
+  # expand the number of points in xy by factor `fx` and spline interpolate
+  sx = seq(xy$x[1], range(xy$x)[2], length.out=length(xy$x)*fx)
+  sy = splinefun(xys)(sx, deriv=1)
+  
+  # locate points that are practically zero
+  zx = sx[which(abs(sy) <= ztol)]
+  
+  # reduce to "real" points/indices in the original data set
+  iz = unique(sapply(zx, function(z){which(xy$x > z)[1]}))-1
+  
+  # distinguish between maxima and minima
+  bpts = do.call(cbind, lapply(c(-5:-1, 1:5), function(n){
+    if (iz+n < 1 || iz+n > length(xys$y)) {
+      return(NA)
+    }
+    xys$y[iz+n]
+  }))
+  is.maxima = xys$y[iz] > rowMeans(bpts, na.rm = T)
+  
+  return(c(lapply(xy, '[', iz), list(indices=iz, is.maxima=is.maxima)))
+}
