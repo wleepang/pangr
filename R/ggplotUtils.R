@@ -10,7 +10,7 @@
 #' then plot 1 will go in the upper left, 2 will go in the upper right, and
 #' 3 will go all the way across the bottom.
 #' 
-#' @section: Credits
+#' @section Credits
 #' This function was copied verbatim from the cookbook for R:
 #' \link{http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/}
 #' 
