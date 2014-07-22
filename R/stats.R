@@ -8,7 +8,7 @@
 #' @param na.rm Boolean flag to ignore \code{NA} values
 #' @param conf.interval Percent range of the inferred confidence interval (default: 95%)
 #' 
-#' @section Credits
+#' @section Credits:
 #' This function was copied verbatim from the cookbook for R:
 #' \link{http://www.cookbook-r.com/Graphs/Plotting_means_and_error_bars_(ggplot2)/}
 #' 
