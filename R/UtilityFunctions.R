@@ -235,7 +235,8 @@ MultiSetFun = function(fun, x) {
 #' @param x Either an \link{xy.coords} object or an atomic numeric vector of x-coordinates
 #' @param y Required if \code{x} is atomic, an atomic numeric vector of y-coordinates
 #'   the same length as \code{x}.
-#' @param ztol Tolerance for "zero" values. Default: 1e-5.
+#' @param ddytol Tolerance for values of the 2nd derivative to flag candidate points as extrema.
+#'   Default (NULL) automatically computes as 10% of the data range.
 #' @param fx Multiplicative factor by which the number of points in the data is
 #'   expanded (via \link{splinefun}) to refine extrema location detection. Default: 1000.
 #'
@@ -258,7 +259,7 @@ MultiSetFun = function(fun, x) {
 #' \link{xy.coords}, \link{smooth.adaptive.loess}, \link{splinefun}
 #' 
 #' @export
-extrema = function(x, y=NULL, ztol=1e-5, fx=1000) {
+extrema = function(x, y=NULL, ddytol=NULL, fx=1000) {
   # locates local extrema
   
   # x can be either an atomic vector or an xy.coords list
@@ -281,16 +282,29 @@ extrema = function(x, y=NULL, ztol=1e-5, fx=1000) {
   
   # smooth xy using adaptive loess
   xys = smooth.adaptive.loess(xy)
+  dxys = smooth.adaptive.loess(list(x=xys$x, y=splinefun(xys)(xys$x, deriv=1)))
   
   # expand the number of points in xy by factor `fx` and spline interpolate
   sx = seq(xy$x[1], range(xy$x)[2], length.out=length(xy$x)*fx)
-  sy = splinefun(xys)(sx, deriv=1)
+  sy = splinefun(xys)(sx)
+  dy = splinefun(xys)(sx, deriv=1)
+  dxy = list(x=sx, y=dy)
   
-  # locate points that are practically zero
-  zx = sx[which(abs(sy) <= ztol)]
+  ddy= splinefun(dxys)(sx, deriv=1)
+  ddxy = list(x=sx, y=ddy)
+  
+  # locate zero crossings
+  if (is.null(ddytol)) {
+    ddytol = diff(range(ddy))*0.1
+  }
+  zcv = abs(diff(sign(dy))) # note: will be 1-point less than input data
+  zcx = sx[sort(intersect(which(zcv > 0), which(abs(ddy) > ddytol)))]
+  zcy = sy[sort(intersect(which(zcv > 0), which(abs(ddy) > ddytol)))]
+  
+  zc = list(x = zcx, y = zcy, v = c(zcv, rev(zcv)[1]))
   
   # reduce to "real" points/indices in the original data set
-  iz = unique(sapply(zx, function(z){which(xy$x > z)[1]}))-1
+  iz = unique(sapply(zcx, function(z){which(xy$x > z)[1]}))-1
   
   # distinguish between maxima and minima
   bpts = do.call(cbind, lapply(c(-5:-1, 1:5), function(n){
@@ -301,5 +315,5 @@ extrema = function(x, y=NULL, ztol=1e-5, fx=1000) {
   }))
   is.maxima = xys$y[iz] > rowMeans(bpts, na.rm = T)
   
-  return(c(lapply(xy, '[', iz), list(indices=iz, is.maxima=is.maxima)))
+  return(c(lapply(xy, '[', iz), list(indices=iz, is.maxima=is.maxima, deriv=list(dxy, ddxy), zc=zc)))
 }
