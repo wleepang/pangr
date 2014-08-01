@@ -317,3 +317,25 @@ extrema = function(x, y=NULL, ddytol=NULL, fx=1000) {
   
   return(c(lapply(xy, '[', iz), list(indices=iz, is.maxima=is.maxima, deriv=list(dxy, ddxy), zc=zc)))
 }
+
+#' Pad a data.matrix reflectively
+#' 
+#' @param X Data matrix to pad
+#' @param wsz number of data points to pad with
+#' 
+#' @return
+#' A padded data matrix with \code{2*wsz} additional rows.
+padMatrix <- function (X, wsz) {
+  # pads a matrix by reflecting the data within a specified window of the ends
+  
+  n = nrow(X)
+  
+  # since R is column based, transpose the input matrix
+  # so that padding appends data column-wise: [..., p2, p1, data-cols, p1, p2, ...]
+  X = t(X)
+  LH = 2*X[,1] - X[,wsz:2]
+  RH = 2*X[,n] - X[,(n-1):(n-wsz)]
+  Y = t(cbind(LH, X, RH))
+  
+  return(Y)
+}
