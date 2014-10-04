@@ -2,6 +2,7 @@
 
 export(extrema)
 export(getKeyValue)
+export(gg_halign)
 export(gregexcap)
 export(hline)
 export(is.between)
@@ -12,3 +13,5 @@ export(smooth.adaptive.loess)
 export(smooth.adaptive.lowess)
 export(smooth.adaptive.spline)
 export(summarySE)
+import(grid)
+import(gridExtra)
