@@ -3,7 +3,7 @@
 \alias{extrema}
 \title{Determine local extrema}
 \usage{
-extrema(x, y = NULL, ztol = 1e-05, ddytol = NULL, fx = 1000)
+extrema(x, y = NULL, ddytol = NULL, fx = 1000)
 }
 \arguments{
 \item{x}{Either an \link{xy.coords} object or an atomic numeric vector of x-coordinates}
@@ -11,9 +11,7 @@ extrema(x, y = NULL, ztol = 1e-05, ddytol = NULL, fx = 1000)
 \item{y}{Required if \code{x} is atomic, an atomic numeric vector of y-coordinates
 the same length as \code{x}.}
 
-\item{ztol}{Tolerance for "zero" values. Default: 1e-5.}
-
-\item{ytol}{Tolerance for values to be flagged as extrema.
+\item{ddytol}{Tolerance for values of the 2nd derivative to flag candidate points as extrema.
 Default (NULL) automatically computes as 10% of the data range.}
 
 \item{fx}{Multiplicative factor by which the number of points in the data is
